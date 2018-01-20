@@ -32,7 +32,7 @@ class TestFactory:
         self.__initializers['monster'] = MonsterInitializer()
 
     def build(self, key):
-        initializer = self.__initializers[key]
-        if initializer is None:
+        if key not in self.__initializers.keys():
             raise InitializerNotFound
+        initializer = self.__initializers[key]
         return initializer.instantiate()

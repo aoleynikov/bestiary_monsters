@@ -9,3 +9,4 @@ class Creature(BaseEntity):
         self.wisdom = wisdom
         self.charisma = charisma
         self.hit_points = hp
+        BaseEntity.__init__(self)

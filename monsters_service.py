@@ -11,6 +11,8 @@ class MonstersService:
         return self.repo.list()
 
     def create(self, monster):
+        if monster.is_invalid():
+            return monster
         xist = self.repo.find(monster.name)
         if xist is None:
             return self.repo.create(monster)
@@ -18,6 +20,8 @@ class MonstersService:
             return None
 
     def update(self, name, monster):
+        if monster.is_invalid():
+            return monster
         xist = self.repo.find(name)
         if xist is None:
             return None

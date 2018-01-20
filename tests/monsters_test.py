@@ -1,8 +1,8 @@
 import unittest
 import json
 from monsters_app import app
-from test_monsters_repo import TestMonstersRepo
-from test_factory import TestFactory
+from tests.test_monsters_repo import TestMonstersRepo
+from tests.test_factory import TestFactory
 
 
 class MonstersTest(unittest.TestCase):
@@ -19,7 +19,7 @@ class MonstersTest(unittest.TestCase):
         monster = self.factory.build('monster')
 
         response = self.client.post('/monsters',
-                                    data=monster.json_response(),
+                                    data=json.dumps(monster.to_json()),
                                     content_type='application/json')
 
         assert response.status_code == 201
@@ -30,7 +30,7 @@ class MonstersTest(unittest.TestCase):
         self.repo.create(monster)
 
         response = self.client.post('/monsters',
-                                    data=monster.json_response(),
+                                    data=json.dumps(monster.to_json()),
                                     content_type='application/json')
 
         assert response.status_code == 409  # Conflict
@@ -72,7 +72,7 @@ class MonstersTest(unittest.TestCase):
     def test_update_non_existing_monster(self):
         monster = self.factory.build('monster')
         response = self.client.put('/monsters/not_existing',
-                                   data=monster.json_response(),
+                                   data=json.dumps(monster.to_json()),
                                    content_type='application/json')
         assert response.status_code == 404
 
@@ -81,8 +81,9 @@ class MonstersTest(unittest.TestCase):
         self.repo.create(monster)
         new_monster_data = self.factory.build('monster')
         response = self.client.put('/monsters/' + monster.name,
-                                   data=new_monster_data.json_response(),
+                                   data=json.dumps(new_monster_data.to_json()),
                                    content_type='application/json')
+
         assert response.status_code == 200
         assert self.repo.find(monster.name) is None
         assert self.repo.find(new_monster_data.name) is not None
@@ -95,11 +96,21 @@ class MonstersTest(unittest.TestCase):
         monster.name = xist.name
         monster.strength = 31
         response = self.client.put('/monsters/' + monster.name,
-                                   data=monster.json_response(),
+                                   data=json.dumps(monster.to_json()),
                                    content_type='application/json')
 
         assert response.status_code == 409  # Conflict
         assert self.repo.find(monster.name).strength != 31
+
+    def test_create_invalid_monster(self):
+        monster = self.factory.build('monster')
+        monster.strength = -1
+
+        response = self.client.post('/monsters',
+                                    data=json.dumps(monster.to_json()),
+                                    content_type='application/json')
+
+        assert response.status_code == 400
 
     def tearDown(self):
         self.repo.delete_all()

@@ -13,7 +13,8 @@ class MonstersRepo():
         return map(lambda d: Monster.from_document(d), all_docs)
 
     def create(self, monster):
-        self.collection.insert(monster.__dict__)
+        doc = monster.to_json()
+        self.collection.insert(doc)
         return monster
 
     def find(self, name):
