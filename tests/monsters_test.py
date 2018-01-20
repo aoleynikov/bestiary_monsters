@@ -74,6 +74,7 @@ class MonstersTest(unittest.TestCase):
         response = self.client.put('/monsters/not_existing',
                                    data=json.dumps(monster.to_json()),
                                    content_type='application/json')
+
         assert response.status_code == 404
 
     def test_update_existing_monster(self):
@@ -102,9 +103,39 @@ class MonstersTest(unittest.TestCase):
         assert response.status_code == 409  # Conflict
         assert self.repo.find(monster.name).strength != 31
 
-    def test_create_invalid_monster(self):
+    def test_create_monster_with_negative_strength(self):
         monster = self.factory.build('monster')
         monster.strength = -1
+
+        response = self.client.post('/monsters',
+                                    data=json.dumps(monster.to_json()),
+                                    content_type='application/json')
+
+        assert response.status_code == 400
+
+    def test_create_monster_without_strength(self):
+        monster = self.factory.build('monster')
+        monster.strength = None
+
+        response = self.client.post('/monsters',
+                                    data=json.dumps(monster.to_json()),
+                                    content_type='application/json')
+
+        assert response.status_code == 400
+
+    def test_create_monster_without_name(self):
+        monster = self.factory.build('monster')
+        monster.name = None
+
+        response = self.client.post('/monsters',
+                                    data=json.dumps(monster.to_json()),
+                                    content_type='application/json')
+
+        assert response.status_code == 400
+
+    def test_create_monster_with_empty_name(self):
+        monster = self.factory.build('monster')
+        monster.strength = ''
 
         response = self.client.post('/monsters',
                                     data=json.dumps(monster.to_json()),

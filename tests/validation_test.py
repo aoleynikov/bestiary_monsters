@@ -1,6 +1,7 @@
 import unittest
 from tests.test_factory import TestFactory
 
+
 class ValidationTest(unittest.TestCase):
     def setUp(self):
         self.factory = TestFactory()

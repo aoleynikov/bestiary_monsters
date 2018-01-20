@@ -5,18 +5,15 @@ class Monster(Creature):
     def __init__(self, name, strength, dexterity, constitution, intelligence, wisdom, charisma, hp):
         Creature.__init__(self, strength, dexterity, constitution, intelligence, wisdom, charisma, hp)
         self.name = name
-        self.__init_validators()
+        self._validators.append(NonEmptyValidator('name', self))
 
     def from_document(document):
-        result = Monster(document['name'],
-                         document['strength'],
-                         document['dexterity'],
-                         document['constitution'],
-                         document['intelligence'],
-                         document['wisdom'],
-                         document['charisma'],
-                         document['hit_points'])
+        result = Monster(document.get('name', None),
+                         document.get('strength', None),
+                         document.get('dexterity', None),
+                         document.get('constitution', None),
+                         document.get('intelligence', None),
+                         document.get('wisdom', None),
+                         document.get('charisma', None),
+                         document.get('hit_points', None))
         return result
-
-    def __init_validators(self):
-        self._validators.append(GreaterThanZeroValidator('strength', self))

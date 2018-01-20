@@ -7,6 +7,14 @@ class GreaterThanZeroValidator(BaseValidator):
         self.error_message = 'should be greater than zero'
 
     def validate(self):
-        if self._value() > 0:
+        value_str = self._value()
+        if value_str is None:
+            self.valid = False
             return
-        self.valid = False
+        val = 0
+        try:
+            val = int(value_str)
+        except ValueError:
+            self.valid = False
+            self.error_message = 'should be an integer'
+        self.valid = int(val) > 0

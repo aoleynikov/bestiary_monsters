@@ -13,13 +13,13 @@ class MonsterInitializer(BaseInitializer):
         name = 'test_monster_' + randint(0, 65000).__str__()
 
         return Monster(name,
-                       randint(0, 30),  # strength
-                       randint(0, 30),  # dexterity
-                       randint(0, 30),  # constitution
-                       randint(0, 30),  # intelligence
-                       randint(0, 30),  # wisdom
-                       randint(0, 30),  # charisma
-                       randint(0, 30))  # hp
+                       randint(1, 30),  # strength
+                       randint(1, 30),  # dexterity
+                       randint(1, 30),  # constitution
+                       randint(1, 30),  # intelligence
+                       randint(1, 30),  # wisdom
+                       randint(1, 30),  # charisma
+                       randint(1, 30))  # hp
 
 
 class InitializerNotFound(BaseException):
