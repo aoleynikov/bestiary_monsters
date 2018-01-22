@@ -1,17 +1,20 @@
 from random import *
-
+from faker import Faker
 from models.monster import Monster
+from models.skill import Skill
 
 
 class BaseInitializer:
+    def __init__(self):
+        self.faker = Faker()
+
     def instantiate(self):
         raise NotImplementedError()
 
 
 class MonsterInitializer(BaseInitializer):
     def instantiate(self):
-        name = 'test_monster_' + randint(0, 65000).__str__()
-
+        name = self.faker.word()
         return Monster(name,
                        randint(1, 30),  # strength
                        randint(1, 30),  # dexterity
@@ -22,6 +25,14 @@ class MonsterInitializer(BaseInitializer):
                        randint(1, 30))  # hp
 
 
+class SkillInitializer(BaseInitializer):
+    def instantiate(self):
+        name = self.faker.word()
+        description = self.faker.text()
+        bonus = randint(-2, 5)
+        return Skill(name, description, bonus)
+
+
 class InitializerNotFound(BaseException):
     pass
 
@@ -30,6 +41,7 @@ class TestFactory:
     def __init__(self):
         self.__initializers = dict()
         self.__initializers['monster'] = MonsterInitializer()
+        self.__initializers['skill'] = SkillInitializer()
 
     def build(self, key):
         if key not in self.__initializers.keys():
