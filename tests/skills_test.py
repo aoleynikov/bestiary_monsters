@@ -44,5 +44,26 @@ class SkillsTest(unittest.TestCase):
 
         assert response.status_code == 409
 
+    def test_remove_skill_from_monster(self):
+        monster = self.factory.build('monster')
+        skill = self.factory.build('skill')
+        self.repo.create(monster)
+        self.repo.append(monster, 'skills', skill)
+
+        response = self.client.delete('/monsters/' + monster.name + '/skills/' + skill.name)
+        assert response.status_code == 200
+        from_mongo = self.repo.find(monster.name)
+        assert len(from_mongo.skills) == 0
+
+    def test_remove_skill_from_non_existing_monster(self):
+        response = self.client.delete('/monsters/nothing/skills/nothing_ball')
+        assert response.status_code == 404
+
+    def test_remove_skill_monster_does_not_have(self):
+        monster = self.factory.build('monster')
+        self.repo.create(monster)
+        response = self.client.delete('/monsters/' + monster.name + '/skills/nothingball')
+        assert response.status_code == 404
+
     def tearDown(self):
         self.repo.delete_all()

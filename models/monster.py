@@ -39,6 +39,8 @@ class Monster(BaseEntity):
         result['skills'] = [s.to_json() for s in self.skills]
         return result
 
+    def skill_names(self):
+        return [s.name for s in self.skills]
 
     def __init_validators(self):
         self._validators.append(NonEmptyValidator('name', self))

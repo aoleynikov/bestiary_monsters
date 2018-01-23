@@ -30,3 +30,6 @@ class MonstersRepo():
     def delete(self, monster):
         self.collection.remove({'name': monster.name})
         return None
+
+    def remove_skill(self, monster, skill_name):
+        self.collection.update({'name': monster.name}, {'$pull': {'skills': {'name': skill_name}}})
