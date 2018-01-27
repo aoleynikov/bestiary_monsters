@@ -1,6 +1,8 @@
 from models.base_entity import BaseEntity
 from models.validators import *
 from models.skill import Skill
+from models.movement import Movement
+from models.action import Action
 
 
 class Monster(BaseEntity):
@@ -16,6 +18,8 @@ class Monster(BaseEntity):
         self.hit_points = hp
 
         self.skills = []
+        self.movements = []
+        self.actions = []
 
         self.__init_validators()
 
@@ -29,18 +33,52 @@ class Monster(BaseEntity):
                          document.get('charisma', None),
                          document.get('hit_points', None))
 
-        if 'skills' in document.keys():
-            result.skills = [Skill.from_document(sd) for sd in document['skills']]
+        result.skills = [Skill.from_document(sd) for sd in document['skills']]
+        result.movements = [Movement.from_document(md) for md in document['movements']]
+        result.actions = [Action.from_document(ad) for ad in document['actions']]
 
         return result
 
     def to_json(self):
         result = super(Monster, self).to_json()
         result['skills'] = [s.to_json() for s in self.skills]
+        result['movements'] = [m.to_json() for m in self.movements]
+        result['actions'] = [a.to_json() for a in self.actions]
         return result
+
+    def validate(self):
+        super(Monster, self).validate()
+        for skill in self.skills:
+            skill.validate()
+        for movement in self.movements:
+            movement.validate()
+
+    def is_invalid(self):
+        self.validate()
+        if self.errors:
+            return True
+        valid = True
+        for s in self.skills:
+            valid = valid and not s.is_invalid()
+        for m in self.movements:
+            valid = valid and not m.is_invalid()
+        return not valid
 
     def skill_names(self):
         return [s.name for s in self.skills]
+
+    def movement_types(self):
+        return [m.type for m in self.movements]
+
+    def get_update_statement(self, other):
+        update_statement = {}
+        self_json = self.to_json()
+        other_json = other.to_json()
+        for key in self_json.keys():
+            if self_json[key] != other_json[key]:
+                update_statement[key] = other_json[key]  # set value of second operand
+
+        return {'$set': update_statement}
 
     def __init_validators(self):
         self._validators.append(NonEmptyValidator('name', self))
@@ -65,3 +103,7 @@ class Monster(BaseEntity):
 
         self._validators.append(RequiredValidator('hit_points', self))
         self._validators.append(GreaterThanZeroValidator('hit_points', self))
+
+        self._validators.append(UniqueDependencyValidator('skills', self, lambda s: s.name))
+        self._validators.append(UniqueDependencyValidator('movements', self, lambda m: m.type))
+        self._validators.append(UniqueDependencyValidator('actions', self, lambda a: a.name))

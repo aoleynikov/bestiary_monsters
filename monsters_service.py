@@ -26,8 +26,8 @@ class MonstersService:
         if xist is None:
             return None
         else:
-            self.delete(xist)
-            return self.create(monster)
+            self.repo.update(name, xist.get_update_statement(monster))
+            return monster
 
     def delete(self, monster):
         self.repo.delete(monster)

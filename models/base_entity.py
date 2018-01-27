@@ -8,11 +8,18 @@ class BaseEntity:
 
     def to_json(self):
         d = self.__dict__.copy()
-        for field_name in ['_id', '_validators', 'errors']:
+        hidden_fields = ['_id', '_validators']
+        if not d['errors']:
+            hidden_fields.append('errors')
+        for field_name in hidden_fields:
             d.pop(field_name, None)
         return d
 
+    def __eq__(self, other):
+        return self.to_json() == other.to_json()
+
     def validate(self):
+        self.errors = {}
         for v in self._validators:
             v.validate()
 
@@ -24,4 +31,4 @@ class BaseEntity:
 
     def is_invalid(self):
         self.validate()
-        return len(self.errors) > 0
+        return bool(self.errors)

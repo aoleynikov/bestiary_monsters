@@ -24,8 +24,8 @@ class MonstersRepo():
         else:
             return Monster.from_document(doc)
 
-    def append(self, monster, field_name, item):
-        self.collection.update({'name': monster.name}, {'$push': {field_name: item.to_json()}})
+    def update(self, name, statement):
+        self.collection.update({'name': name}, statement)
 
     def delete(self, monster):
         self.collection.remove({'name': monster.name})

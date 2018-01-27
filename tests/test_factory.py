@@ -2,6 +2,8 @@ from random import *
 from faker import Faker
 from models.monster import Monster
 from models.skill import Skill
+from models.movement import Movement
+from models.action import Action
 
 
 class BaseInitializer:
@@ -33,6 +35,20 @@ class SkillInitializer(BaseInitializer):
         return Skill(name, description, bonus)
 
 
+class MovementInitializer(BaseInitializer):
+    def instantiate(self):
+        allowed_types = ['', 'walk', 'swim', 'fly', 'run', 'climb', 'crawl']
+        selected_type = allowed_types[randint(0, len(allowed_types) - 1)]
+        return Movement(selected_type, randint(1, 120))
+
+
+class ActionInitializer(BaseInitializer):
+    def instantiate(self):
+        name = self.faker.word()
+        description = self.faker.text()
+        return Action(name, description)
+
+
 class InitializerNotFound(BaseException):
     pass
 
@@ -42,6 +58,8 @@ class TestFactory:
         self.__initializers = dict()
         self.__initializers['monster'] = MonsterInitializer()
         self.__initializers['skill'] = SkillInitializer()
+        self.__initializers['movement'] = MovementInitializer()
+        self.__initializers['action'] = ActionInitializer()
 
     def build(self, key):
         if key not in self.__initializers.keys():
