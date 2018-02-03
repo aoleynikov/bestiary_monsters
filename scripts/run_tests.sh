@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-docker-compose build web && docker-compose run web nosetests
+docker-compose build monsters && docker-compose run monsters nosetests

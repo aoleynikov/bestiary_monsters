@@ -27,8 +27,8 @@ class MonstersRepo():
     def update(self, name, statement):
         self.collection.update({'name': name}, statement)
 
-    def delete(self, monster):
-        self.collection.remove({'name': monster.name})
+    def delete(self, name):
+        self.collection.remove({'name': name})
         return None
 
     def remove_skill(self, monster, skill_name):

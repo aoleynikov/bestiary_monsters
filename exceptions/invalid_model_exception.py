@@ -1,0 +1,2 @@
+class InvalidModelException(BaseException):
+    pass
