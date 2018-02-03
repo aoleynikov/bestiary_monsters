@@ -10,6 +10,7 @@ class Skill(BaseEntity):
         self.bonus = bonus
         self.__init_validators()
 
+    @staticmethod
     def from_document(document):
         return Skill(document.get('name', None),
                      document.get('description', None),

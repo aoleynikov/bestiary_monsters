@@ -3,5 +3,7 @@ ENV PYTHONUNBUFFERED 1
 RUN mkdir /code
 WORKDIR /code
 ENV FLASK_APP monsters_app.py
+ARG JWT_SECRET
+ENV JWT_SECRET=${JWT_SECRET}
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt

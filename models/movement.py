@@ -9,6 +9,7 @@ class Movement(BaseEntity):
         self.speed = speed
         self.__init_validators()
 
+    @staticmethod
     def from_document(document):
         return Movement(document.get('type', None),
                         document.get('speed', None))

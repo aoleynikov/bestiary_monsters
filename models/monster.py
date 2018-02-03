@@ -23,6 +23,7 @@ class Monster(BaseEntity):
 
         self.__init_validators()
 
+    @staticmethod
     def from_document(document):
         result = Monster(document.get('name', None),
                          document.get('strength', None),

@@ -9,6 +9,7 @@ class Action(BaseEntity):
         self.description = description
         self.__init_validators()
 
+    @staticmethod
     def from_document(document):
         return Action(document.get('name', None),
                       document.get('description', None))
