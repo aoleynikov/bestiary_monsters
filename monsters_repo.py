@@ -5,8 +5,8 @@ from models.monster import Monster
 
 class MonstersRepo():
     def __init__(self):
-        client = MongoClient('mongo', 27017)
-        self.collection = client.local['monsters']
+        self.client = MongoClient('mongo', 27017)
+        self.collection = self.client.local['monsters']
 
     def list(self):
         all_docs = self.collection.find({})

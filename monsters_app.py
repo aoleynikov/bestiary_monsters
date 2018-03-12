@@ -1,4 +1,5 @@
 import json
+import requests
 from flask import Flask, request, Response
 from models.monster import Monster
 from monsters_service import MonstersService
@@ -7,8 +8,28 @@ from exceptions import *
 app = Flask(__name__)
 
 
+def auth():
+    header = request.headers.get('Authorization', None)
+    if header is None:
+        return Response(None, status=401)
+
+    tokens = header.split(' ')
+    if len(tokens) != 2 or tokens[0] != 'Bearer':
+        return Response(None, status=401)
+    jwt = tokens[1]
+
+    result = requests.get('http://bestiary_auth_1:5000/verify?token=' + jwt)
+    if result.status_code == 400:
+        return Response(None, status=401)
+    else:
+        return None
+
+
 def build_response(operation, model, success_code):
     try:
+        auth_response = auth()
+        if auth_response is not None:
+            return auth_response
         result = operation()
     except ConflictException:
         return Response(None, status=409)

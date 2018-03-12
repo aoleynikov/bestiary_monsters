@@ -4,9 +4,14 @@ import copy
 from monsters_app import app
 from tests.test_monsters_repo import TestMonstersRepo
 from tests.test_factory import TestFactory
+from tests.test_user_manager import TestUserManager
 
 
 class MonstersTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.token = TestUserManager.create_and_authorize()
+
     def setUp(self):
         self.repo = TestMonstersRepo()
         self.client = app.test_client(self)
@@ -17,7 +22,8 @@ class MonstersTest(unittest.TestCase):
 
         response = self.client.post('/',
                                     data=json.dumps(monster.to_json()),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 201
         assert self.repo.find(monster.name) is not None
@@ -28,7 +34,8 @@ class MonstersTest(unittest.TestCase):
 
         response = self.client.post('/',
                                     data=json.dumps(monster.to_json()),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 409  # Conflict
 
@@ -54,14 +61,16 @@ class MonstersTest(unittest.TestCase):
             assert len(found) == 1
 
     def test_delete_non_existent_monster(self):
-        response = self.client.delete('/not_existing')
+        response = self.client.delete('/not_existing',
+                                      headers={'Authorization': 'Bearer ' + MonstersTest.token})
         assert response.status_code == 404
 
     def test_delete_existing_monster(self):
         monster = self.factory.build('monster')
         self.repo.create(monster)
 
-        response = self.client.delete('/' + monster.name)
+        response = self.client.delete('/' + monster.name,
+                                      headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 200
         assert self.repo.find(monster.name) is None
@@ -70,7 +79,8 @@ class MonstersTest(unittest.TestCase):
         monster = self.factory.build('monster')
         response = self.client.put('/not_existing',
                                    data=json.dumps(monster.to_json()),
-                                   content_type='application/json')
+                                   content_type='application/json',
+                                   headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 404
 
@@ -82,7 +92,8 @@ class MonstersTest(unittest.TestCase):
         new_monster_data.skills.append(monster.skills[0])
         response = self.client.put('/' + monster.name,
                                    data=json.dumps(new_monster_data.to_json()),
-                                   content_type='application/json')
+                                   content_type='application/json',
+                                   headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 200
         assert self.repo.find(monster.name) is None
@@ -99,7 +110,8 @@ class MonstersTest(unittest.TestCase):
         monster.strength = 31
         response = self.client.put('/' + old_monster_name,
                                    data=json.dumps(monster.to_json()),
-                                   content_type='application/json')
+                                   content_type='application/json',
+                                   headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 409  # Conflict
         assert self.repo.find(monster.name).strength != 31
@@ -110,7 +122,8 @@ class MonstersTest(unittest.TestCase):
 
         response = self.client.post('/',
                                     data=json.dumps(monster.to_json()),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 400
 
@@ -120,7 +133,8 @@ class MonstersTest(unittest.TestCase):
 
         response = self.client.post('/',
                                     data=json.dumps(monster.to_json()),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 400
 
@@ -130,7 +144,8 @@ class MonstersTest(unittest.TestCase):
 
         response = self.client.post('/',
                                     data=json.dumps(monster.to_json()),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 400
 
@@ -140,7 +155,8 @@ class MonstersTest(unittest.TestCase):
 
         response = self.client.post('/',
                                     data=json.dumps(monster.to_json()),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 400
 
@@ -169,7 +185,8 @@ class MonstersTest(unittest.TestCase):
 
         response = self.client.post('/',
                                     data=json.dumps(monster.to_json()),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 400
         assert 'errors' in json.loads(response.data)['skills'][0].keys()
@@ -182,7 +199,8 @@ class MonstersTest(unittest.TestCase):
 
         response = self.client.post('/',
                                     data=json.dumps(monster.to_json()),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers={'Authorization': 'Bearer ' + MonstersTest.token})
         assert response.status_code == 400
 
     def test_should_fail_with_repeating_movement_types(self):
@@ -193,7 +211,8 @@ class MonstersTest(unittest.TestCase):
 
         response = self.client.post('/',
                                     data=json.dumps(monster.to_json()),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers={'Authorization': 'Bearer ' + MonstersTest.token})
         assert response.status_code == 400
 
     def test_should_fail_with_repeating_movement_types(self):
@@ -204,7 +223,8 @@ class MonstersTest(unittest.TestCase):
 
         response = self.client.post('/',
                                     data=json.dumps(monster.to_json()),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers={'Authorization': 'Bearer ' + MonstersTest.token})
         assert response.status_code == 400
 
     def test_should_not_erase_dependencies_on_property_update(self):
@@ -216,9 +236,8 @@ class MonstersTest(unittest.TestCase):
         monster.strength = 31
         response = self.client.put('/' + monster.name,
                                    data=json.dumps(monster.to_json()),
-                                   content_type='application/json')
-
-        print(response)
+                                   content_type='application/json',
+                                   headers={'Authorization': 'Bearer ' + MonstersTest.token})
 
         assert response.status_code == 200
         from_db = self.repo.find(monster.name)
@@ -228,6 +247,10 @@ class MonstersTest(unittest.TestCase):
 
     def tearDown(self):
         self.repo.delete_all()
+
+    @classmethod
+    def tearDownClass(cls):
+        TestUserManager.clean_up(cls.token)
 
 
 if __name__ == '__main__':
